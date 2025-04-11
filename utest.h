@@ -1,8 +1,8 @@
 #ifndef CPP_UTILS_UTEST_H
 #define CPP_UTILS_UTEST_H
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <type_traits>
 
 #define UTest(name)                                                            \
   void test_function_##name(                                                   \
@@ -16,16 +16,16 @@
   }
 
 #define uassert(expr)                                                          \
-  if (utest::assert_impl("ASSERT", expr, #expr, __FILE__, __LINE__) != 0) {    \
+  if (utest::assert_("ASSERT", expr, #expr, __FILE__, __LINE__) != 0) {        \
     ++__test_status__.nb_assert_failed;                                        \
   }
-#define uassert_equal(lhs, rhs)                                                \
-  if (utest::assert_equal_impl("ASSERT", lhs, rhs, #lhs, #rhs, __FILE__,       \
-                               __LINE__) != 0) {                               \
+#define uassert_equal(found, expect)                                           \
+  if (utest::assert_equal_("ASSERT", found, expect, #found, #expect, __FILE__, \
+                           __LINE__) != 0) {                                   \
     ++__test_status__.nb_assert_failed;                                        \
   }
 #define urequire(expr)                                                         \
-  if (utest::assert_impl("REQUIRE", expr, #expr, __FILE__, __LINE__) != 0) {   \
+  if (utest::assert_("REQUIRE", expr, #expr, __FILE__, __LINE__) != 0) {       \
     __test_status__.require_failed = true;                                     \
     return;                                                                    \
   }
@@ -58,9 +58,9 @@ inline void error(std::string const &group, std::string const filename,
             << line << ": " << msg << std::endl;
 }
 
-inline int assert_impl(std::string const &group, bool expr,
-                       std::string const &expr_str, std::string const &filename,
-                       size_t line) {
+inline int assert_(std::string const &group, bool expr,
+                   std::string const &expr_str, std::string const &filename,
+                   size_t line) {
   if (!expr) {
     error(group, filename, line, "`" + expr_str + "` evaluated to false.");
     return 1;
@@ -68,12 +68,15 @@ inline int assert_impl(std::string const &group, bool expr,
   return 0;
 }
 
-inline int assert_equal_impl(std::string const &group, auto const &lhs,
-                             auto const &rhs, std::string const &lhs_str,
-                             std::string const &rhs_str,
-                             std::string const &filename, size_t line) {
-  if (lhs != rhs) {
-    error(group, filename, line, "`" + lhs_str + "` != `" + rhs_str + "`.");
+inline int assert_equal_(std::string const &group, auto const &found,
+                         auto const &expect, std::string const &lhs_str,
+                         std::string const &rhs_str,
+                         std::string const &filename, size_t line) {
+  if (found != expect) {
+    std::ostringstream oss;
+    oss << "`" << lhs_str << "` != `" << rhs_str << "` -> found " << found
+        << " expected " << expect << ".";
+    error(group, filename, line, oss.str());
     return 1;
   }
   return 0;
