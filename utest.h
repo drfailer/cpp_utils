@@ -62,7 +62,7 @@ inline int assert_(std::string const &group, bool expr,
                    std::string const &expr_str, std::string const &filename,
                    size_t line) {
   if (!expr) {
-    error(group, filename, line, "`" + expr_str + "` evaluated to false.");
+    error(group, filename, line, expr_str + " evaluated to false.");
     return 1;
   }
   return 0;
@@ -74,8 +74,8 @@ inline int assert_equal_(std::string const &group, auto const &found,
                          std::string const &filename, size_t line) {
   if (found != expect) {
     std::ostringstream oss;
-    oss << "`" << lhs_str << "` != `" << rhs_str << "` -> found " << found
-        << " expected " << expect << ".";
+    oss << lhs_str << " != " << rhs_str << " -> " << found << " != " << expect
+        << ".";
     error(group, filename, line, oss.str());
     return 1;
   }
