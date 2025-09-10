@@ -17,13 +17,13 @@
 
 #define UTEST_STATUS __utest_nb_test_failed__
 
-#define UTest(name)                                                            \
+#define UTest(name, ...)                                                       \
     void test_function_##name(                                                 \
-        [[maybe_unused]] utest::test_status_t &__test_status__)
+        [[maybe_unused]] utest::test_status_t &__test_status__, __VA_ARGS__)
 
-#define urun_test(name)                                                        \
+#define urun_test(name, ...)                                                   \
     ++__utest_nb_test__;                                                       \
-    if (utest::run(test_function_##name, #name)) {                             \
+    if (utest::run(test_function_##name, #name, __VA_ARGS__)) {                \
         ++__utest_nb_test_failed__;                                            \
     }
 
@@ -78,9 +78,9 @@ inline void error(std::string const &group, std::string const filename,
               << line << ": " << msg << std::endl;
 }
 
-inline bool run(auto test_function, std::string const test_name) {
+inline bool run(auto test_function, std::string const test_name, auto &&...args) {
     utest::test_status_t status{false, 0};
-    test_function(status);
+    test_function(status, std::forward<decltype(args)>(args)...);
     utest::report(test_name, status);
     return status.nb_assert_failed > 0 || status.require_failed;
 }
