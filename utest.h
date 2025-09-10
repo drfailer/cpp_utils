@@ -33,12 +33,14 @@
     }
 #define uassert_equal(found, expect)                                           \
     if (utest::assert_equal_("ASSERT", found, expect, #found, #expect,         \
-                             __FILE__, __LINE__) != 0) {                       \
+                             __FILE__, __LINE__)                               \
+        != 0) {                                                                \
         ++__test_status__.nb_assert_failed;                                    \
     }
 #define uassert_float_equal(found, expect, prec)                               \
     if (utest::assert_float_equal_("ASSERT", found, expect, prec, #found,      \
-                                   #expect, __FILE__, __LINE__) != 0) {        \
+                                   #expect, __FILE__, __LINE__)                \
+        != 0) {                                                                \
         ++__test_status__.nb_assert_failed;                                    \
     }
 #define urequire(expr)                                                         \
@@ -50,7 +52,7 @@
 namespace utest {
 
 struct test_status_t {
-    bool require_failed = false;
+    bool   require_failed = false;
     size_t nb_assert_failed = 0;
 };
 

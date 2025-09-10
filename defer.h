@@ -1,10 +1,14 @@
 #ifndef CPP_UTILS_DEFER_H
 #define CPP_UTILS_DEFER_H
 
-template <typename T> struct Defer {
-  T run;
-  Defer(T run) : run(run) {}
-  ~Defer() { run(); }
+template <typename T>
+struct Defer {
+    T run;
+    Defer(T run)
+        : run(run) {}
+    ~Defer() {
+        run();
+    }
 };
 
 #define defer_impl(ops, suffix) Defer defer_##suffix([&]() { ops; });
